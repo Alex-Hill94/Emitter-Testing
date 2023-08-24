@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm as tqdm
 
 def source(n):
+    '''
+    Function to randomly generate starting points for photons
+    '''
     np.random.seed()
     x_vals = np.random.rand(int(n)) - 0.5
     y_vals = np.zeros(len(x_vals))
@@ -21,9 +24,6 @@ def path(source, angle, length = 1000):
     y_offset = abs(length*np.sin(angle))
     output = [source[0] - x_offset, source[1] + y_offset]
     return np.array(output)
-
-
-
 
 def do_vectors_intersect(v1_start, v1_end, v2_start, v2_end):
     """
@@ -115,13 +115,84 @@ def line_intersection(line1, line2):
     return x, y
 
 
-line1 = [[-0.5, 0.0], [-0.5, 1.0]]
-line2 = [[0.5, 0.0], [0.5, 1.0]]
-line3 = [[-0.5, 0.0], [0.5, 0.0]]
+def pltp(point1, point2, extension_distance = 10):
+    # pltp = plot line through points
+    x1, y1 = point1
+    x2, y2 = point2
+
+    # Calculate the slope and intercept of the line
+    slope = (y2 - y1) / (x2 - x1)
+    intercept = y1 - slope * x1
+
+    # Generate x values for the line, including the extension
+    extended_x = np.linspace(x1, x2 + extension_distance, num=2)
+
+    # Calculate corresponding y values using the line equation
+    extended_y = slope * extended_x + intercept
+
+    return extended_x, extended_y
+
+
+
+s_thk = 1. # Ta sheet thickness [mm]
+s_sep = 1. # Ta sheet separation [mm]
+aperture_width = .2 # Width of aperture [mm]
+
+line1 = [[-s_sep/2., 0.0], [-s_sep/2., s_thk]]
+line2 = [[s_sep/2., 0.0], [s_sep/2., s_thk]]
+line3 = [[-s_sep/2., 0.0], [s_sep/2., 0.0]]
+lid   = [[-s_sep/2., 1.0], [s_sep/2., 1.0]]
+hole  = [[-aperture_width/2., 1.0], [aperture_width/2., 1.0]]
+
 line4 = [[-5.,5.0], [5.,5.0]]
 
-N = 50000
+N = 50
 v = source(N)
+
+data = v[0]
+ex_x_1, ex_y_1 = pltp(data, hole[0])
+ex_x_2, ex_y_2 = pltp(data, hole[1])
+
+fig, axs = plt.subplots(1,1, figsize = [8,4])
+
+axs.plot([line1[0][0], line1[1][0]], [line1[0][1], line1[1][1]], color = 'red', lw = 3)
+axs.plot([line2[0][0], line2[1][0]], [line2[0][1], line2[1][1]], color = 'blue', lw = 3)
+axs.plot([line3[0][0], line3[1][0]], [line3[0][1], line3[1][1]], color = 'orange', lw = 3)
+axs.plot([line4[0][0], line4[1][0]], [line4[0][1], line4[1][1]], color = 'yellow', lw = 3)
+axs.plot([lid[0][0], lid[1][0]], [lid[0][1], lid[1][1]], color = 'black', lw = 3)
+axs.plot([hole[0][0], hole[1][0]], [hole[0][1], hole[1][1]], color = 'white', lw = 3)
+axs.plot(ex_x_1, ex_y_1, label='Line through points', color = 'grey')
+axs.plot(ex_x_2, ex_y_2, label='Line through points', color = 'grey')
+axs.scatter(data[0], data[1], color='red', label='Points')
+axs.scatter(hole[0][0], hole[0][1], color='red', label='Points')
+axs.scatter(hole[1][0], hole[1][1], color='red', label='Points')
+
+# Set labels and title
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Line Through Two Points in 2D Space')
+
+# Add legend
+plt.legend()
+
+# Show the plot
+plt.show()
+
+
+fig, axs = plt.subplots(1,1, figsize = [8,4])
+
+axs.plot([line1[0][0], line1[1][0]], [line1[0][1], line1[1][1]], color = 'red', lw = 3)
+axs.plot([line2[0][0], line2[1][0]], [line2[0][1], line2[1][1]], color = 'blue', lw = 3)
+axs.plot([line3[0][0], line3[1][0]], [line3[0][1], line3[1][1]], color = 'orange', lw = 3)
+axs.plot([line4[0][0], line4[1][0]], [line4[0][1], line4[1][1]], color = 'yellow', lw = 3)
+axs.plot([lid[0][0], lid[1][0]], [lid[0][1], lid[1][1]], color = 'black', lw = 3)
+axs.plot([hole[0][0], hole[1][0]], [hole[0][1], hole[1][1]], color = 'white', lw = 3)
+axs.scatter(v[:,0], v[:,1])
+axs.set_xlim([-20, 20])
+axs.set_ylim([0, 20])
+plt.show()
+
+'''
 a = ang(N)
 
 P = []
@@ -154,13 +225,13 @@ axs.plot([line3[0][0], line3[1][0]], [line3[0][1], line3[1][1]], color = 'blue',
 axs.plot([line4[0][0], line4[1][0]], [line4[0][1], line4[1][1]], color = 'blue', lw = 3)
 axs.set_xlim([-20, 20])
 axs.set_ylim([0, 20])
-plt.savefig('diagram.png')
+plt.savefig('diagram.pdf')
 
 X_VALS = np.array(X_VALS)
 plt.figure()
 plt.hist(X_VALS, bins = 100)
-plt.savefig('plot.png')
-
+plt.savefig('plot.pdf')
+'''
 '''
 v1_start = (0, 0)
 v1_end = (4, 4)
